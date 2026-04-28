@@ -1,0 +1,227 @@
+import os
+import datetime
+import subprocess
+import json
+import sys
+import requests
+
+REPORT_HTML = "Advanced_PrivEsc_Report.html"
+REPORT_JSON = "Advanced_PrivEsc_Report.json"
+
+report_content = ""
+json_data = []
+risk_score = 0
+
+# ---------- CLI FLAGS ----------
+MODE = "deep"
+if "--quick" in sys.argv:
+    MODE = "quick"
+
+# ---------- SAFE CMD ----------
+def run_cmd(cmd):
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return result.stdout.strip()
+    except:
+        return ""
+
+# ---------- ADD REPORT ----------
+def add_to_report(title, severity, desc, fix, output):
+    global report_content, json_data, risk_score
+    
+    if not output:
+        return
+
+    # Risk scoring
+    if severity == "high":
+        risk_score += 20
+    elif severity == "medium":
+        risk_score += 10
+    elif severity == "low":
+        risk_score += 5
+
+    report_content += f"""
+    <div class="card {severity}">
+        <h2>{title} ({severity.upper()})</h2>
+        <p><b>Description:</b> {desc}</p>
+        <p><b>Mitigation:</b> {fix}</p>
+        <pre>{output}</pre>
+    </div>
+    """
+
+    json_data.append({
+        "title": title,
+        "severity": severity,
+        "description": desc,
+        "mitigation": fix,
+        "output": output
+    })
+
+# ---------- CVE FETCH ----------
+def fetch_cve(kernel_version):
+    try:
+        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={kernel_version}"
+        res = requests.get(url, timeout=5)
+        data = res.json()
+
+        cves = []
+        for item in data.get("vulnerabilities", [])[:5]:
+            cve_id = item["cve"]["id"]
+            cves.append(cve_id)
+
+        return "\n".join(cves)
+    except:
+        return "CVE fetch failed (no internet or API limit)"
+
+# ---------- HTML TEMPLATE ----------
+html_template = """
+<html>
+<head>
+<style>
+body { font-family: Arial; background:#0f172a; color:#e2e8f0; padding:20px; }
+.card { background:#1e293b; padding:15px; margin:10px; border-radius:10px; }
+.high { border-left:5px solid red; }
+.medium { border-left:5px solid orange; }
+.low { border-left:5px solid blue; }
+pre { background:black; color:#00ff00; padding:10px; overflow-x:auto; }
+</style>
+</head>
+<body>
+<h1>Advanced Privilege Escalation Report</h1>
+<p>Date: {date}</p>
+<h2>Overall Risk Score: {score}%</h2>
+{content}
+</body>
+</html>
+"""
+
+print(f"[*] Starting Scan in {MODE.upper()} mode...")
+
+# ---------- SYSTEM ----------
+user = run_cmd("whoami")
+kernel = run_cmd("uname -r")
+
+add_to_report(
+    "System Info",
+    "low",
+    "Basic system details",
+    "Keep system updated",
+    f"User: {user}\nKernel: {kernel}"
+)
+
+# ---------- QUICK MODE LIMIT ----------
+if MODE == "quick":
+    print("[*] Running Quick Scan (limited modules)...")
+
+# ---------- SUID ----------
+if MODE == "deep":
+    suid = run_cmd("find / -perm -4000 -type f 2>/dev/null")
+    add_to_report(
+        "SUID Binaries",
+        "high",
+        "SUID binaries may allow privilege escalation",
+        "Remove unnecessary SUID bits",
+        suid
+    )
+
+    # GTFOBins
+    gtfo_bins = ["find", "vim", "nano", "bash", "sh", "awk", "perl", "python"]
+    danger = []
+
+    for line in suid.split("\n"):
+        for b in gtfo_bins:
+            if line.endswith("/" + b):
+                danger.append(line)
+
+    add_to_report(
+        "GTFOBins Exploitable Binaries",
+        "high",
+        "Known binaries exploitable via GTFOBins",
+        "Restrict execution or remove SUID",
+        "\n".join(danger)
+    )
+
+# ---------- WRITABLE FILES ----------
+writable = run_cmd("find / -writable -type f 2>/dev/null | head -n 20")
+add_to_report(
+    "World Writable Files",
+    "high",
+    "Writable files can be abused",
+    "Use chmod to restrict access",
+    writable
+)
+
+# ---------- SUDO ----------
+sudo = run_cmd("sudo -l -n 2>/dev/null")
+severity = "high" if "NOPASSWD" in sudo else "medium"
+
+add_to_report(
+    "Sudo Permissions",
+    severity,
+    "Improper sudo config may allow escalation",
+    "Remove unnecessary privileges",
+    sudo
+)
+
+# ---------- CRON ----------
+if MODE == "deep":
+    cron = run_cmd("ls -la /etc/cron* 2>/dev/null")
+    add_to_report(
+        "Cron Jobs",
+        "medium",
+        "Cron jobs may run malicious scripts",
+        "Ensure scripts are not writable",
+        cron
+    )
+
+# ---------- CAPABILITIES ----------
+caps = run_cmd("getcap -r / 2>/dev/null")
+add_to_report(
+    "Linux Capabilities",
+    "medium",
+    "Capabilities can allow privilege abuse",
+    "Remove unnecessary capabilities",
+    caps
+)
+
+# ---------- PASSWORD HUNT ----------
+passwords = run_cmd("grep -iE 'pass|password|key' ~/.bash_history 2>/dev/null | head -n 10")
+add_to_report(
+    "Password Exposure",
+    "medium",
+    "Sensitive data may be leaked in history",
+    "Avoid storing passwords in plain text",
+    passwords
+)
+
+# ---------- CVE CHECK ----------
+cve_data = fetch_cve(kernel)
+add_to_report(
+    "Kernel CVE Matches",
+    "high",
+    "Matching kernel version with known vulnerabilities",
+    "Update kernel or apply patches",
+    cve_data
+)
+
+# ---------- FINAL SCORE ----------
+final_score = min(risk_score, 100)
+
+# ---------- SAVE HTML ----------
+final_html = html_template.format(
+    date=datetime.datetime.now(),
+    content=report_content,
+    score=final_score
+)
+
+with open(REPORT_HTML, "w") as f:
+    f.write(final_html)
+
+# ---------- SAVE JSON ----------
+with open(REPORT_JSON, "w") as f:
+    json.dump(json_data, f, indent=4)
+
+print("[+] Reports Generated:")
+print(" - HTML:", REPORT_HTML)
+print(" - JSON:", REPORT_JSON)
+print(f"[+] Risk Score: {final_score}%")

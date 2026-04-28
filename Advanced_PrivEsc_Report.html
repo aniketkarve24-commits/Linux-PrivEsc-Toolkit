@@ -1,0 +1,281 @@
+
+<html>
+<head>
+<style>
+body { font-family: Arial; background:#0f172a; color:#e2e8f0; padding:20px; }
+.card { background:#1e293b; padding:15px; margin:10px; border-radius:10px; }
+.high { border-left:5px solid red; }
+.medium { border-left:5px solid orange; }
+.low { border-left:5px solid blue; }
+pre { background:black; color:#00ff00; padding:10px; }
+summary { color:#38bdf8; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>⚡ OSCP PrivEsc Framework</h1>
+<p>Date: 2026-04-28 08:28:09.526347</p>
+<h2>Risk Score: 75%</h2>
+
+
+<div class="card">
+<h2>🚨 EXECUTIVE SUMMARY</h2>
+<p>High: 2</p>
+<p>Medium: 1</p>
+<p>Low: 1</p>
+</div>
+
+
+    <div class="card low">
+        <h2>🟢 LOW | System Info</h2>
+        <p><b>📌 Description:</b> System baseline</p>
+        <p><b>🛠 Fix:</b> Patch system</p>
+        <p><b>🎯 MITRE:</b> T1082</p>
+        <p><b>📊 Confidence:</b> 0.3</p>
+        <p><b>⚔ Attack:</b> No simulation available</p>
+
+        <details>
+            <summary>Evidence</summary>
+            <pre>kali
+6.19.11+kali-amd64</pre>
+        </details>
+    </div>
+    
+    <div class="card high">
+        <h2>🔴 HIGH | World Writable Files</h2>
+        <p><b>📌 Description:</b> Writable risk</p>
+        <p><b>🛠 Fix:</b> Fix permissions</p>
+        <p><b>🎯 MITRE:</b> T1222</p>
+        <p><b>📊 Confidence:</b> 0.7</p>
+        <p><b>⚔ Attack:</b> Inject malicious config</p>
+
+        <details>
+            <summary>Evidence</summary>
+            <pre>/home/kali/.config/user-dirs.locale
+/home/kali/.config/qterminal.org/qterminal.ini
+/home/kali/.config/powershell/Microsoft.PowerShell_profile.ps1
+/home/kali/.config/cherrytree/config.cfg
+/home/kali/.config/xfce4/panel/launcher-7/17773126224.desktop
+/home/kali/.config/xfce4/panel/launcher-7/17773126225.desktop
+/home/kali/.config/xfce4/panel/launcher-7/17773126223.desktop
+/home/kali/.config/xfce4/panel/genmon-15.rc
+/home/kali/.config/xfce4/panel/launcher-6/17773126222.desktop
+/home/kali/.config/xfce4/panel/launcher-5/17773126221.desktop</pre>
+        </details>
+    </div>
+    
+    <div class="card medium">
+        <h2>🟠 MEDIUM | Cron Jobs</h2>
+        <p><b>📌 Description:</b> Task risk</p>
+        <p><b>🛠 Fix:</b> Secure cron</p>
+        <p><b>🎯 MITRE:</b> T1053.003</p>
+        <p><b>📊 Confidence:</b> 0.85</p>
+        <p><b>⚔ Attack:</b> Modify cron job → root execution</p>
+
+        <details>
+            <summary>Evidence</summary>
+            <pre>-rw-r--r-- 1 root root 1042 Jan  7 08:31 /etc/crontab
+
+/etc/cron.d:
+total 36
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rw-r--r--   1 root root   188 Jan  2 10:01 e2scrub_all
+-rw-r--r--   1 root root   607 Jun  3  2025 john
+-rw-r--r--   1 root root   712 Dec 20 00:47 php
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder
+-rw-r--r--   1 root root   400 Jan 15  2024 sysstat
+
+/etc/cron.daily:
+total 48
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rwxr-xr-x   1 root root   539 Jan 27 17:53 apache2
+-rwxr-xr-x   1 root root  1478 Mar  5 05:55 apt-compat
+-rwxr-xr-x   1 root root   123 Jan 28 22:43 dpkg
+-rwxr-xr-x   1 root root   377 Jul 14  2024 logrotate
+-rwxr-xr-x   1 root root  1395 May  2  2025 man-db
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder
+-rwxr-xr-x   1 root root   652 Dec  7  2020 plocate
+-rwxr-xr-x   1 root root   526 Jan 15  2024 sysstat
+
+/etc/cron.hourly:
+total 20
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder
+
+/etc/cron.monthly:
+total 20
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder
+
+/etc/cron.weekly:
+total 24
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rwxr-xr-x   1 root root  1055 May  2  2025 man-db
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder
+
+/etc/cron.yearly:
+total 20
+drwxr-xr-x   2 root root  4096 Apr 27 14:04 .
+drwxr-xr-x 184 root root 12288 Apr 28 08:25 ..
+-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder</pre>
+        </details>
+    </div>
+    
+    <div class="card high">
+        <h2>🔴 HIGH | Linux Capabilities Misuse</h2>
+        <p><b>📌 Description:</b> Detected</p>
+        <p><b>🛠 Fix:</b> Review dangerous capabilities assigned to binaries</p>
+        <p><b>🎯 MITRE:</b> T0000</p>
+        <p><b>📊 Confidence:</b> 0.5</p>
+        <p><b>⚔ Attack:</b> No simulation available</p>
+
+        <details>
+            <summary>Evidence</summary>
+            <pre>/usr/bin/fping cap_net_raw=ep
+/usr/bin/dumpcap cap_net_admin,cap_net_raw=eip
+/usr/lib/nmap/nmap cap_net_bind_service,cap_net_admin,cap_net_raw=eip</pre>
+        </details>
+    </div>
+    
+
+<h2>Remediation</h2>
+
+    <div class="card">
+        <h3>System Info</h3>
+        <pre>
+==============================
+🛠 AUTO FIX
+==============================
+No auto fix available
+
+==============================
+🔍 MANUAL ANALYSIS
+==============================
+Perform manual security audit
+
+==============================
+⚔ EXPLOIT PATH (HOW ATTACK HAPPENS)
+==============================
+Analyze manually based on context
+
+==============================
+💥 IMPACT
+==============================
+Depends on system configuration
+
+==============================
+⚠ IMPORTANT NOTE
+==============================
+Requires human analysis for accurate assessment
+</pre>
+    </div>
+    
+    <div class="card">
+        <h3>World Writable Files</h3>
+        <pre>
+==============================
+🛠 AUTO FIX
+==============================
+chmod 644 <file>
+
+==============================
+🔍 MANUAL ANALYSIS
+==============================
+find / -writable -type f
+Check service dependency on file
+Identify config injection points
+
+==============================
+⚔ EXPLOIT PATH (HOW ATTACK HAPPENS)
+==============================
+Overwrite config / script
+Inject malicious command or reverse shell
+Trigger service restart
+
+==============================
+💥 IMPACT
+==============================
+Configuration hijacking → privilege escalation
+
+==============================
+⚠ IMPORTANT NOTE
+==============================
+Writable system files are high-risk attack vectors
+</pre>
+    </div>
+    
+    <div class="card">
+        <h3>Cron Jobs</h3>
+        <pre>
+==============================
+🛠 AUTO FIX
+==============================
+chmod 644 /etc/cron*
+
+==============================
+🔍 MANUAL ANALYSIS
+==============================
+cat /etc/crontab
+Check writable scripts in cron jobs
+Inspect cron.d, cron.daily, cron.hourly
+
+==============================
+⚔ EXPLOIT PATH (HOW ATTACK HAPPENS)
+==============================
+If script is writable:
+inject reverse shell payload
+wait for root cron execution
+
+==============================
+💥 IMPACT
+==============================
+Automatic root execution (time-based privilege escalation)
+
+==============================
+⚠ IMPORTANT NOTE
+==============================
+Cron misconfig = silent persistent root access
+</pre>
+    </div>
+    
+    <div class="card">
+        <h3>Linux Capabilities Misuse</h3>
+        <pre>
+==============================
+🛠 AUTO FIX
+==============================
+setcap -r <binary>
+
+==============================
+🔍 MANUAL ANALYSIS
+==============================
+getcap -r /
+Identify binaries with cap_net_admin, cap_sys_admin
+
+==============================
+⚔ EXPLOIT PATH (HOW ATTACK HAPPENS)
+==============================
+Example:
+nmap --interactive → !sh
+python cap_sys_ptrace → inject process
+
+==============================
+💥 IMPACT
+==============================
+Privilege escalation without SUID
+
+==============================
+⚠ IMPORTANT NOTE
+==============================
+Capabilities often bypass traditional SUID detection
+</pre>
+    </div>
+    
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+[
+    {
+        "title": "System Info",
+        "severity": "low",
+        "mitre": "T1082",
+        "confidence": 0.3,
+        "output": "kali\n6.19.11+kali-amd64"
+    },
+    {
+        "title": "World Writable Files",
+        "severity": "high",
+        "mitre": "T1222",
+        "confidence": 0.7,
+        "output": "/home/kali/.config/user-dirs.locale\n/home/kali/.config/qterminal.org/qterminal.ini\n/home/kali/.config/powershell/Microsoft.PowerShell_profile.ps1\n/home/kali/.config/cherrytree/config.cfg\n/home/kali/.config/xfce4/panel/launcher-7/17773126224.desktop\n/home/kali/.config/xfce4/panel/launcher-7/17773126225.desktop\n/home/kali/.config/xfce4/panel/launcher-7/17773126223.desktop\n/home/kali/.config/xfce4/panel/genmon-15.rc\n/home/kali/.config/xfce4/panel/launcher-6/17773126222.desktop\n/home/kali/.config/xfce4/panel/launcher-5/17773126221.desktop"
+    },
+    {
+        "title": "Cron Jobs",
+        "severity": "medium",
+        "mitre": "T1053.003",
+        "confidence": 0.85,
+        "output": "-rw-r--r-- 1 root root 1042 Jan  7 08:31 /etc/crontab\n\n/etc/cron.d:\ntotal 36\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rw-r--r--   1 root root   188 Jan  2 10:01 e2scrub_all\n-rw-r--r--   1 root root   607 Jun  3  2025 john\n-rw-r--r--   1 root root   712 Dec 20 00:47 php\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder\n-rw-r--r--   1 root root   400 Jan 15  2024 sysstat\n\n/etc/cron.daily:\ntotal 48\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rwxr-xr-x   1 root root   539 Jan 27 17:53 apache2\n-rwxr-xr-x   1 root root  1478 Mar  5 05:55 apt-compat\n-rwxr-xr-x   1 root root   123 Jan 28 22:43 dpkg\n-rwxr-xr-x   1 root root   377 Jul 14  2024 logrotate\n-rwxr-xr-x   1 root root  1395 May  2  2025 man-db\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder\n-rwxr-xr-x   1 root root   652 Dec  7  2020 plocate\n-rwxr-xr-x   1 root root   526 Jan 15  2024 sysstat\n\n/etc/cron.hourly:\ntotal 20\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder\n\n/etc/cron.monthly:\ntotal 20\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder\n\n/etc/cron.weekly:\ntotal 24\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rwxr-xr-x   1 root root  1055 May  2  2025 man-db\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder\n\n/etc/cron.yearly:\ntotal 20\ndrwxr-xr-x   2 root root  4096 Apr 27 14:04 .\ndrwxr-xr-x 184 root root 12288 Apr 28 08:25 ..\n-rw-r--r--   1 root root   102 Jan  7 08:31 .placeholder"
+    },
+    {
+        "title": "Linux Capabilities Misuse",
+        "severity": "high",
+        "mitre": "T0000",
+        "confidence": 0.5,
+        "output": "/usr/bin/fping cap_net_raw=ep\n/usr/bin/dumpcap cap_net_admin,cap_net_raw=eip\n/usr/lib/nmap/nmap cap_net_bind_service,cap_net_admin,cap_net_raw=eip"
+    }
+]
