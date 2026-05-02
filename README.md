@@ -12,4 +12,5 @@ A professional-grade auditing framework designed for **OSCP** aspirants and **Cy
 ```bash
 python3 gui.py
 
-![Scan Results](https://github.com/user-attachments/assets/24beb463-562a-456c-8f37-e7d69a2d11d6)
+
+<img width="1178" height="1429" alt="Screenshot 2026-04-29 171123" src="https://github.com/user-attachments/assets/e32c19c1-652a-4ec7-a964-0b91cbfed0ad" />
